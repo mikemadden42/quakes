@@ -1,6 +1,7 @@
 package main
 
 // https://tutorialedge.net/golang/consuming-restful-api-with-go/
+// https://mholt.github.io/json-to-go/
 
 import (
 	"encoding/json"
@@ -77,12 +78,12 @@ func main() {
 	json.Unmarshal(responseData, &responseObject)
 
 	fmt.Println(responseObject.Metadata.Title)
-	for i := 0; i < len(responseObject.Features); i++ {
+	for _, quake := range responseObject.Features {
 		fmt.Println(
-			time.Unix(responseObject.Features[i].Properties.Time/1000, 0),
-			responseObject.Features[i].Properties.Type,
-			responseObject.Features[i].Properties.Mag,
-			responseObject.Features[i].Properties.Place,
-			responseObject.Features[i].Geometry.Coordinates[2])
+			time.Unix(quake.Properties.Time/1000, 0),
+			quake.Properties.Type,
+			quake.Properties.Mag,
+			quake.Properties.Place,
+			quake.Geometry.Coordinates[2])
 	}
 }

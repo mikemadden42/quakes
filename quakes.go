@@ -59,7 +59,7 @@ type quakes struct {
 		} `json:"geometry"`
 		ID string `json:"id"`
 	} `json:"features"`
-	Bbox []int `json:"bbox"`
+	Bbox []float64 `json:"bbox"`
 }
 
 func main() {
@@ -75,8 +75,8 @@ func main() {
 	}
 
 	var responseObject quakes
-	json.Unmarshal(responseData, &responseObject)
-
+	err = json.Unmarshal(responseData, &responseObject)
+	checkErr(err)
 	fmt.Println(responseObject.Metadata.Title)
 	for _, quake := range responseObject.Features {
 		fmt.Println(
@@ -85,5 +85,11 @@ func main() {
 			quake.Properties.Mag,
 			quake.Properties.Place,
 			quake.Geometry.Coordinates[2])
+	}
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
 	}
 }

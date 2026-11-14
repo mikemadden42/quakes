@@ -1,0 +1,9 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {"title": "USGS All Earthquakes, Past Day", "count": 3},
+  "features": [
+    {"type": "Feature", "properties": {"mag": 2.44, "place": "8 km W of Holtville, CA", "time": 1700000000123, "type": "earthquake"}, "geometry": {"type": "Point", "coordinates": [-115.4, 32.8, 11.29]}, "id": "a"},
+    {"type": "Feature", "properties": {"mag": null, "place": "Somewhere", "time": 1700000060000, "type": "quarry blast"}, "geometry": {"type": "Point", "coordinates": [-120.0, 35.0, 0.5]}, "id": "b"},
+    {"type": "Feature", "properties": {"mag": 1.0, "place": "No depth", "time": 1700000120000, "type": "earthquake"}, "geometry": {"type": "Point", "coordinates": [-120.0, 35.0]}, "id": "c"}
+  ]
+}

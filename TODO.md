@@ -18,17 +18,17 @@
 - [x] Fix lint findings: add a package comment, rename `Ids` → `IDs`
 
 ## Tooling / config
-- [ ] Migrate `.golangci.yml` to v2 schema (`golangci-lint config verify` currently fails):
-  - [ ] `version: "2"` (string, not number)
-  - [ ] `disable-all: true` → `linters.default: none`
-  - [ ] `linters-settings` → `linters.settings`
-  - [ ] `issues.exclude-dirs` → `linters.exclusions.paths`
-  - [ ] `goimports.local-prefixes` → `formatters.settings.goimports.local-prefixes` (list)
-  - [ ] Consider enabling `bodyclose` and `staticcheck`
-- [ ] Fix `.goreleaser.yaml` (`goreleaser check` currently fails):
-  - [ ] Add `version: 2` header
-  - [ ] `snapshot.name_template` → `snapshot.version_template`
-  - [ ] Remove the no-op `go generate ./...` hook
+- [x] Migrate `.golangci.yml` to v2 schema (`golangci-lint config verify` currently fails):
+  - [x] `version: "2"` (string, not number)
+  - [x] `disable-all: true` → `linters.default: none`
+  - [x] `linters-settings` → `linters.settings`
+  - [x] `issues.exclude-dirs` → `linters.exclusions.paths`
+  - [x] `goimports.local-prefixes` → `formatters.settings.goimports.local-prefixes` (list)
+  - [x] Consider enabling `bodyclose` and `staticcheck`
+- [x] Fix `.goreleaser.yaml` (`goreleaser check` currently fails):
+  - [x] Add `version: 2` header
+  - [x] `snapshot.name_template` → `snapshot.version_template`
+  - [x] Remove the no-op `go generate ./...` hook
 - [ ] Update CI matrix to supported Go versions (1.26.x, 1.27.x)
 - [ ] Bump `go.mod` from `go 1.18` to the minimum version tested
 - [ ] Decide on `make release` — it passes `--snapshot`, so it never publishes and nearly duplicates `make build`

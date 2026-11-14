@@ -1,4 +1,4 @@
-// Package main prints the past day's earthquakes from the USGS GeoJSON feed.
+// Package main prints recent earthquakes from the USGS GeoJSON summary feeds.
 package main
 
 // https://tutorialedge.net/golang/consuming-restful-api-with-go/
@@ -6,15 +6,28 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
-const feedURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+const feedBase = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/"
+
+// feedURL returns the summary feed URL for a name like "all_day" or "2.5_week".
+func feedURL(name string) (string, error) {
+	level, period, ok := strings.Cut(name, "_")
+	validLevel := map[string]bool{"all": true, "significant": true, "4.5": true, "2.5": true, "1.0": true}
+	validPeriod := map[string]bool{"hour": true, "day": true, "week": true, "month": true}
+	if !ok || !validLevel[level] || !validPeriod[period] {
+		return "", fmt.Errorf("unknown feed %q: want {all,significant,4.5,2.5,1.0}_{hour,day,week,month}", name)
+	}
+	return feedBase + name + ".geojson", nil
+}
 
 type quakes struct {
 	Metadata struct {
@@ -34,11 +47,20 @@ type quakes struct {
 }
 
 func main() {
-	client := &http.Client{Timeout: 15 * time.Second}
-	q, err := fetch(client, feedURL)
+	feed := flag.String("feed", "all_day", "USGS summary feed, e.g. all_hour, 2.5_day, significant_week")
+	minMag := flag.Float64("min-mag", 0, "only show quakes at or above this magnitude")
+	flag.Parse()
+
+	url, err := feedURL(*feed)
 	if err != nil {
 		log.Fatal(err)
 	}
+	client := &http.Client{Timeout: 15 * time.Second}
+	q, err := fetch(client, url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	filter(q, *minMag)
 	if err := report(os.Stdout, q); err != nil {
 		log.Fatal(err)
 	}
@@ -63,6 +85,21 @@ func decode(r io.Reader) (*quakes, error) {
 		return nil, fmt.Errorf("decoding feed: %w", err)
 	}
 	return &q, nil
+}
+
+// filter drops quakes below minMag. A quake with no magnitude is kept only
+// when minMag is 0.
+func filter(q *quakes, minMag float64) {
+	if minMag <= 0 {
+		return
+	}
+	kept := q.Features[:0]
+	for _, quake := range q.Features {
+		if quake.Properties.Mag != nil && *quake.Properties.Mag >= minMag {
+			kept = append(kept, quake)
+		}
+	}
+	q.Features = kept
 }
 
 func report(w io.Writer, q *quakes) error {

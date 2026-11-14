@@ -38,4 +38,4 @@
 ## Project hygiene
 - [x] Add tests — split fetch/print into functions taking `io.Reader`/`io.Writer` and test against a saved GeoJSON fixture
 - [x] Flesh out `README.md`: what it does, install/run, sample output
-- [ ] Add flags for feed selection (`all_hour`, `2.5_day`, `significant_week`, …) and/or minimum magnitude
+- [x] Add flags for feed selection (`all_hour`, `2.5_day`, `significant_week`, …) and/or minimum magnitude

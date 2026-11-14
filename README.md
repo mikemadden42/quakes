@@ -1,6 +1,6 @@
 # quakes
 
-Prints the past day's earthquakes from the [USGS earthquake feed](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php).
+Prints recent earthquakes from the [USGS earthquake feed](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php).
 
 ## Install
 
@@ -13,8 +13,15 @@ Prebuilt binaries for Linux, macOS, and Windows are attached to [releases](https
 ## Usage
 
 ```sh
-quakes
+quakes                          # all quakes, past day
+quakes -feed significant_week   # significant quakes, past week
+quakes -feed 2.5_day -min-mag 4 # M2.5+ feed, past day, M4 and up only
 ```
+
+| Flag | Default | Description |
+|---|---|---|
+| `-feed` | `all_day` | USGS summary feed: `{all,significant,4.5,2.5,1.0}_{hour,day,week,month}` |
+| `-min-mag` | `0` | Only show quakes at or above this magnitude (quakes with no magnitude are hidden when set) |
 
 Each line shows the time (local zone), event type, magnitude, location, and depth. An unknown magnitude or depth prints as `?`.
 

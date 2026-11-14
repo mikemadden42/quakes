@@ -88,3 +88,44 @@ func TestFetch(t *testing.T) {
 		t.Errorf("err = %v, want 503 error", err)
 	}
 }
+
+func TestFeedURL(t *testing.T) {
+	for _, name := range []string{"all_day", "all_hour", "significant_week", "4.5_month", "2.5_day", "1.0_hour"} {
+		got, err := feedURL(name)
+		if err != nil {
+			t.Errorf("feedURL(%q): %v", name, err)
+			continue
+		}
+		if want := feedBase + name + ".geojson"; got != want {
+			t.Errorf("feedURL(%q) = %q, want %q", name, got, want)
+		}
+	}
+	for _, name := range []string{"", "all", "day", "all_year", "3.0_day", "all_day_extra", "../all_day"} {
+		if _, err := feedURL(name); err == nil {
+			t.Errorf("feedURL(%q): expected error", name)
+		}
+	}
+}
+
+func TestFilter(t *testing.T) {
+	tests := []struct {
+		minMag float64
+		want   []string
+	}{
+		{0, []string{"8 km W of Holtville, CA", "Somewhere", "No depth"}},
+		{1.0, []string{"8 km W of Holtville, CA", "No depth"}},
+		{2.0, []string{"8 km W of Holtville, CA"}},
+		{5.0, nil},
+	}
+	for _, tt := range tests {
+		q := loadFixture(t)
+		filter(q, tt.minMag)
+		var got []string
+		for _, f := range q.Features {
+			got = append(got, f.Properties.Place)
+		}
+		if strings.Join(got, "|") != strings.Join(tt.want, "|") {
+			t.Errorf("filter(%v) = %q, want %q", tt.minMag, got, tt.want)
+		}
+	}
+}

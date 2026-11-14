@@ -33,9 +33,9 @@
 - [x] Bump `go.mod` from `go 1.18` to the minimum version tested
 - [ ] Decide on `make release` — it passes `--snapshot`, so it never publishes and nearly duplicates `make build`
 - [ ] Remove `Jenkinsfile` unless Jenkins is still in use (duplicates GitHub Actions, builds outside goreleaser)
-- [ ] Add `dist/` and the `quakes` binary to `.gitignore`
+- [x] Add `dist/` and the `quakes` binary to `.gitignore`
 
 ## Project hygiene
 - [x] Add tests — split fetch/print into functions taking `io.Reader`/`io.Writer` and test against a saved GeoJSON fixture
-- [ ] Flesh out `README.md`: what it does, install/run, sample output
+- [x] Flesh out `README.md`: what it does, install/run, sample output
 - [ ] Add flags for feed selection (`all_hour`, `2.5_day`, `significant_week`, …) and/or minimum magnitude

@@ -4,7 +4,7 @@ build:
 check:
 	golangci-lint run
 
-release:
+snapshot:
 	goreleaser release --snapshot --clean
 
-.PHONY: build check release
+.PHONY: build check snapshot

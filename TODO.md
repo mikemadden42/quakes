@@ -31,8 +31,8 @@
   - [x] Remove the no-op `go generate ./...` hook
 - [x] Update CI matrix to supported Go versions (1.26.x, 1.27.x)
 - [x] Bump `go.mod` from `go 1.18` to the minimum version tested
-- [ ] Decide on `make release` — it passes `--snapshot`, so it never publishes and nearly duplicates `make build`
-- [ ] Remove `Jenkinsfile` unless Jenkins is still in use (duplicates GitHub Actions, builds outside goreleaser)
+- [x] Decide on `make release` — it passes `--snapshot`, so it never publishes and nearly duplicates `make build`
+- [x] Remove `Jenkinsfile` unless Jenkins is still in use (duplicates GitHub Actions, builds outside goreleaser)
 - [x] Add `dist/` and the `quakes` binary to `.gitignore`
 
 ## Project hygiene

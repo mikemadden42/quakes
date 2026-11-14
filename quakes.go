@@ -1,3 +1,4 @@
+// Package main prints the past day's earthquakes from the USGS GeoJSON feed.
 package main
 
 // https://tutorialedge.net/golang/consuming-restful-api-with-go/
@@ -13,83 +14,79 @@ import (
 	"time"
 )
 
+const feedURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+
 type quakes struct {
-	Type     string `json:"type"`
 	Metadata struct {
-		Generated int64  `json:"generated"`
-		URL       string `json:"url"`
-		Title     string `json:"title"`
-		Status    int    `json:"status"`
-		API       string `json:"api"`
-		Count     int    `json:"count"`
+		Title string `json:"title"`
 	} `json:"metadata"`
 	Features []struct {
-		Type       string `json:"type"`
 		Properties struct {
-			Mag     float64     `json:"mag"`
-			Place   string      `json:"place"`
-			Time    int64       `json:"time"`
-			Updated int64       `json:"updated"`
-			Tz      int         `json:"tz"`
-			URL     string      `json:"url"`
-			Detail  string      `json:"detail"`
-			Felt    interface{} `json:"felt"`
-			Cdi     interface{} `json:"cdi"`
-			Mmi     interface{} `json:"mmi"`
-			Alert   interface{} `json:"alert"`
-			Status  string      `json:"status"`
-			Tsunami int         `json:"tsunami"`
-			Sig     int         `json:"sig"`
-			Net     string      `json:"net"`
-			Code    string      `json:"code"`
-			Ids     string      `json:"ids"`
-			Sources string      `json:"sources"`
-			Types   string      `json:"types"`
-			Nst     interface{} `json:"nst"`
-			Dmin    interface{} `json:"dmin"`
-			Rms     float64     `json:"rms"`
-			Gap     interface{} `json:"gap"`
-			MagType string      `json:"magType"`
-			Type    string      `json:"type"`
-			Title   string      `json:"title"`
+			Mag   *float64 `json:"mag"`
+			Place string   `json:"place"`
+			Time  int64    `json:"time"`
+			Type  string   `json:"type"`
 		} `json:"properties"`
 		Geometry struct {
-			Type        string    `json:"type"`
 			Coordinates []float64 `json:"coordinates"`
 		} `json:"geometry"`
-		ID string `json:"id"`
 	} `json:"features"`
-	Bbox []float64 `json:"bbox"`
 }
 
 func main() {
-	response, err := http.Get("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson")
-	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
-	}
-
-	responseData, err := io.ReadAll(response.Body)
+	client := &http.Client{Timeout: 15 * time.Second}
+	q, err := fetch(client, feedURL)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	var responseObject quakes
-	err = json.Unmarshal(responseData, &responseObject)
-	checkErr(err)
-	fmt.Println(responseObject.Metadata.Title)
-	for _, quake := range responseObject.Features {
-		fmt.Println(
-			time.Unix(quake.Properties.Time/1000, 0),
-			quake.Properties.Type,
-			quake.Properties.Mag,
-			quake.Properties.Place,
-			quake.Geometry.Coordinates[2])
+	if err := report(os.Stdout, q); err != nil {
+		log.Fatal(err)
 	}
 }
 
-func checkErr(err error) {
+func fetch(client *http.Client, url string) (*quakes, error) {
+	response, err := client.Get(url)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+	defer response.Body.Close() //nolint:errcheck // read-only body
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("fetching %s: %s", url, response.Status)
+	}
+	return decode(response.Body)
+}
+
+func decode(r io.Reader) (*quakes, error) {
+	var q quakes
+	if err := json.NewDecoder(r).Decode(&q); err != nil {
+		return nil, fmt.Errorf("decoding feed: %w", err)
+	}
+	return &q, nil
+}
+
+func report(w io.Writer, q *quakes) error {
+	if _, err := fmt.Fprintln(w, q.Metadata.Title); err != nil {
+		return err
+	}
+	for _, quake := range q.Features {
+		mag := "?"
+		if quake.Properties.Mag != nil {
+			mag = fmt.Sprintf("%.1f", *quake.Properties.Mag)
+		}
+		depth := "?"
+		if c := quake.Geometry.Coordinates; len(c) >= 3 {
+			depth = fmt.Sprintf("%.1f km", c[2])
+		}
+		_, err := fmt.Fprintf(w, "%s  %s  %4s  %s  %s\n",
+			time.UnixMilli(quake.Properties.Time).Format("2006-01-02 15:04:05 MST"),
+			quake.Properties.Type,
+			mag,
+			quake.Properties.Place,
+			depth)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

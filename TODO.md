@@ -29,8 +29,8 @@
   - [x] Add `version: 2` header
   - [x] `snapshot.name_template` → `snapshot.version_template`
   - [x] Remove the no-op `go generate ./...` hook
-- [ ] Update CI matrix to supported Go versions (1.26.x, 1.27.x)
-- [ ] Bump `go.mod` from `go 1.18` to the minimum version tested
+- [x] Update CI matrix to supported Go versions (1.26.x, 1.27.x)
+- [x] Bump `go.mod` from `go 1.18` to the minimum version tested
 - [ ] Decide on `make release` — it passes `--snapshot`, so it never publishes and nearly duplicates `make build`
 - [ ] Remove `Jenkinsfile` unless Jenkins is still in use (duplicates GitHub Actions, builds outside goreleaser)
 - [ ] Add `dist/` and the `quakes` binary to `.gitignore`

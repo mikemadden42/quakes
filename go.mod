@@ -1,3 +1,3 @@
 module github.com/mikemadden42/quakes
 
-go 1.18
+go 1.26

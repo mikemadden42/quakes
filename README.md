@@ -31,7 +31,8 @@ USGS All Earthquakes, Past Day
 |---|---|
 | `go test ./...` | Run tests |
 | `make check` | Lint with golangci-lint |
-| `make build` | Snapshot build for all platforms via goreleaser (output in `dist/`) |
+| `make build` | Build binaries for all platforms via goreleaser (output in `dist/`) |
+| `make snapshot` | Build binaries plus release archives and checksums locally, without publishing |
 
 ## License
 
